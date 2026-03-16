@@ -2,7 +2,7 @@ import { CreateRoomInput, UpdateRoomInput } from "@/types";
 import * as repo from "./room.repository";
 
 export const listRooms = () => {
-  return repo.findRooms();
+  return repo.getRooms();
 };
 
 export const addRoom = (data: CreateRoomInput) => {

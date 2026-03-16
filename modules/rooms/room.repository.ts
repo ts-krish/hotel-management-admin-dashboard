@@ -1,7 +1,7 @@
 import pool from "@/lib/db";
 import { CreateRoomInput, Room, UpdateRoomInput } from "@/types";
 
-export const findRooms = async (): Promise<Room[]> => {
+export const getRooms = async (): Promise<Room[]> => {
   try {
     const rooms = await pool.query<Room>(`
       SELECT room_number,room_type,price_per_night,status 
