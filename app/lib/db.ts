@@ -1,12 +1,7 @@
 import { Pool } from "pg";
 
 const pool = new Pool({
-  host: process.env.PGHOST,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
-  port: Number(process.env.PGPORT),
-  max: 10,
+  connectionString: process.env.DATABASE_URL,
 });
 
 pool.on("error", (err) => {

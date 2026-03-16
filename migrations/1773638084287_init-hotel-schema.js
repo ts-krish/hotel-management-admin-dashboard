@@ -15,11 +15,7 @@ exports.up = (pgm) => {
   /* ROOM TABLE */
 
   pgm.createTable("room", {
-    room_id: {
-      type: "int",
-      primaryKey: true,
-      generatedAlwaysAsIdentity: true,
-    },
+    room_id: "id",
 
     room_number: {
       type: "int",
@@ -49,11 +45,7 @@ exports.up = (pgm) => {
   /* GUEST TABLE */
 
   pgm.createTable("guest", {
-    guest_id: {
-      type: "int",
-      primaryKey: true,
-      generatedAlwaysAsIdentity: true,
-    },
+    guest_id: "id",
 
     full_name: {
       type: "text",
@@ -76,11 +68,7 @@ exports.up = (pgm) => {
   pgm.createTable(
     "booking",
     {
-      booking_id: {
-        type: "int",
-        primaryKey: true,
-        generatedAlwaysAsIdentity: true,
-      },
+      booking_id: "id",
 
       guest_id: {
         type: "int",

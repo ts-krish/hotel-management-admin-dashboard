@@ -9,7 +9,8 @@
     "lint": "eslint",
     "migrate:create": "node-pg-migrate create",
     "migrate:up": "node-pg-migrate -r dotenv/config up",
-    "migrate:down": "node-pg-migrate down"
+    "migrate:down": "node-pg-migrate -r dotenv/config down",
+    "seed": "tsx -r dotenv/config seeds/seed.ts"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
@@ -28,6 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
