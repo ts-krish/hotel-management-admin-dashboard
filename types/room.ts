@@ -8,5 +8,3 @@ export interface Room {
   price_per_night: number;
   status: RoomStatus;
 }
-export type CreateRoomInput = Omit<Room, "room_id">;
-export type UpdateRoomInput = Partial<CreateRoomInput>;

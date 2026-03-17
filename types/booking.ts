@@ -8,5 +8,3 @@ export interface Booking {
   check_out_date: string;
   status: BookingStatus;
 }
-export type CreateBookingInput = Omit<Booking, "booking_id">;
-export type UpdateBookingInput = Partial<CreateBookingInput>;

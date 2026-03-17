@@ -4,6 +4,3 @@ export interface Guest {
   email: string;
   phone_number: string;
 }
-
-export type CreateGuestInput = Omit<Guest, "guest_id">;
-export type UpdateGuestInput = Partial<CreateGuestInput>;
