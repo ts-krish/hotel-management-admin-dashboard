@@ -1,5 +1,5 @@
-import * as guestService from "@/modules/guests";
-import { CreateGuestInput } from "@/types/guest";
+import { createGuestSchema } from "@/modules/guests";
+import * as guestService from "@/modules/guests/guest.service";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
@@ -7,8 +7,21 @@ export const GET = async () => {
   return NextResponse.json(guests, { status: 200 });
 };
 
-export const POST = async (req: Request): Promise<NextResponse> => {
-  const body: CreateGuestInput = await req.json();
-  const newGuest = await guestService.addGuest(body);
-  return NextResponse.json(newGuest, { status: 201 });
+export const POST = async (req: Request) => {
+  try {
+    const body = await req.json();
+    const parsed = createGuestSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+    }
+    const newGuest = await guestService.addGuest(parsed.data);
+
+    return NextResponse.json(newGuest, { status: 201 });
+  } catch (error) {
+    console.error("POST /guests", error);
+    return NextResponse.json(
+      { error: "Failed to create guest" },
+      { status: 500 },
+    );
+  }
 };

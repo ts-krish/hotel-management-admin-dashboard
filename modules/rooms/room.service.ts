@@ -1,9 +1,7 @@
-import { CreateRoomInput, UpdateRoomInput } from "@/types";
+import { CreateRoomInput, UpdateRoomInput } from "./room.schema";
 import * as repo from "./room.repository";
 
-export const listRooms = () => {
-  return repo.getRooms();
-};
+export const listRooms = () => repo.getRooms();
 
 export const addRoom = (data: CreateRoomInput) => {
   return repo.insertRoom(data);

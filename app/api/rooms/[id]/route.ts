@@ -1,5 +1,5 @@
 import * as roomService from "@/modules/rooms";
-import { UpdateRoomInput } from "@/types";
+import { updateRoomSchema } from "@/modules/rooms/room.schema";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (
@@ -9,16 +9,22 @@ export const PATCH = async (
   try {
     const { id } = await params;
     const roomId = Number(id);
-    const body: UpdateRoomInput = await req.json();
-    const updatedRoom = await roomService.modifyRoom(roomId, body);
 
-    if (!updatedRoom)
+    const body = await req.json();
+    const parsed = updateRoomSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+    }
+    const updatedRoom = await roomService.modifyRoom(roomId, parsed.data);
+
+    if (!updatedRoom) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    }
 
     return NextResponse.json(updatedRoom);
   } catch (error) {
-    console.error(error);
-
+    console.error("PATCH /rooms/[id]:", error);
     return NextResponse.json(
       { error: "Failed to update room" },
       { status: 500 },
@@ -45,8 +51,7 @@ export const DELETE = async (
       { status: 200 },
     );
   } catch (error) {
-    console.error(error);
-
+    console.error("DELETE /room/[id]:", error);
     return NextResponse.json(
       { error: "Failed to delete room" },
       { status: 500 },

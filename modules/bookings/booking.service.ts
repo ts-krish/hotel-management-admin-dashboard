@@ -1,5 +1,5 @@
-import { CreateBookingInput, UpdateBookingInput } from "@/types";
-import * as repo from "../bookings";
+import * as repo from "./booking.repository";
+import { CreateBookingInput, UpdateBookingInput } from "./booking.schema";
 
 export const listBookings = () => {
   return repo.getBookings();

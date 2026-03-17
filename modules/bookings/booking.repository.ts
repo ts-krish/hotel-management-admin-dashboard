@@ -1,33 +1,33 @@
 import pool from "@/lib/db";
-import { CreateBookingInput, Booking, UpdateBookingInput } from "@/types";
+import { CreateBookingInput, UpdateBookingInput } from "./booking.schema";
 
 export const getBookings = async () => {
   try {
-    const booking = await pool.query<Booking>(`
-      SELECT guest_id,room_id,check_in_date,check_out_date,status
+    const result = await pool.query(`
+      SELECT booking_id, guest_id, room_id, check_in_date, check_out_date, status
       FROM booking
     `);
-    return booking.rows;
+    return result.rows;
   } catch (error) {
     console.error("Failed to fetch bookings:", error);
     throw error;
   }
 };
 
-export const insertBooking = async (
-  data: CreateBookingInput,
-): Promise<Booking> => {
+export const insertBooking = async (data: CreateBookingInput) => {
   try {
     const { guest_id, room_id, check_in_date, check_out_date, status } = data;
-    const newBooking = await pool.query<Booking>(
+
+    const result = await pool.query(
       `
-            INSERT INTO booking (guest_id,room_id,check_in_date,check_out_date,status)
-            VALUES ($1,$2,$3,$4,$5)
-            RETURNING *
-        `,
+      INSERT INTO booking (guest_id, room_id, check_in_date, check_out_date, status)
+      VALUES ($1, $2, $3, $4, $5::booking_status)
+      RETURNING *
+      `,
       [guest_id, room_id, check_in_date, check_out_date, status],
     );
-    return newBooking.rows[0];
+
+    return result.rows[0];
   } catch (error) {
     console.error("Failed to create booking:", error);
     throw error;
@@ -37,21 +37,22 @@ export const insertBooking = async (
 export const updateBooking = async (
   bookingId: number,
   data: UpdateBookingInput,
-): Promise<Booking> => {
+) => {
   try {
     const { guest_id, room_id, check_in_date, check_out_date, status } = data;
-    const updatedBooking = await pool.query(
+
+    const result = await pool.query(
       `
-                UPDATE booking
-                SET
-                    guest_id = COALESCE($1, guest_id),
-                    room_id = COALESCE($2, room_id),
-                    check_in_date = COALESCE($3, check_in_date),
-                    check_out_date = COALESCE($4, check_out_date),
-                    status = COALESCE($5, status)
-                WHERE guest_id = $6
-                RETURNING *
-            `,
+      UPDATE booking
+      SET
+        guest_id = COALESCE($1, guest_id),
+        room_id = COALESCE($2, room_id),
+        check_in_date = COALESCE($3, check_in_date),
+        check_out_date = COALESCE($4, check_out_date),
+        status = COALESCE($5::booking_status, status)
+      WHERE booking_id = $6
+      RETURNING *
+      `,
       [
         guest_id ?? null,
         room_id ?? null,
@@ -61,14 +62,15 @@ export const updateBooking = async (
         bookingId,
       ],
     );
-    return updatedBooking.rows[0] ?? null;
+
+    return result.rows[0] ?? null;
   } catch (error) {
     console.error("Failed to update booking:", error);
     throw error;
   }
 };
 
-export const deleteBooking = async (bookingId: number): Promise<boolean> => {
+export const deleteBooking = async (bookingId: number) => {
   try {
     const result = await pool.query(
       `

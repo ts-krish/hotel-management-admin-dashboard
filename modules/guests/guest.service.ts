@@ -1,5 +1,5 @@
-import { CreateGuestInput, UpdateGuestInput } from "@/types";
-import * as repo from "../guests";
+import * as repo from "./guest.repository";
+import { CreateGuestInput, UpdateGuestInput } from "./guest.schema";
 
 export const listGuests = () => {
   return repo.getGuests();
