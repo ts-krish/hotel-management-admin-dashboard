@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { CreateGuestInput, Guest, UpdateGuestInput } from "@/types/guest";
+import { CreateGuestInput, Guest, UpdateGuestInput } from "@/types";
 
 export const getGuests = async () => {
   try {
