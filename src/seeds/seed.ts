@@ -1,4 +1,4 @@
-import pool from "@/src/lib/db";
+import { pool } from "@/lib";
 
 const seed = async () => {
   try {

@@ -1,5 +1,5 @@
-import { CreateRoomInput, UpdateRoomInput } from "./room.schema";
 import * as repo from "./room.repository";
+import { CreateRoomInput, UpdateRoomInput } from "./room.schema";
 
 export const listRooms = () => repo.getRooms();
 

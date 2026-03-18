@@ -1,4 +1,4 @@
-import pool from "@/src/lib/db";
+import { pool } from "@/lib";
 
 export const findAdmin = async (email: string) => {
   const result = await pool.query(

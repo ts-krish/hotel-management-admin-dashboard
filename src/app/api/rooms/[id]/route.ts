@@ -1,5 +1,5 @@
-import * as roomService from "@/src/modules/rooms";
-import { updateRoomSchema } from "@/src/modules/rooms/room.schema";
+import * as roomService from "@/modules/rooms";
+import { updateRoomSchema } from "@/modules/rooms";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (

@@ -1,5 +1,5 @@
-import pool from "@/src/lib/db";
-import { Room } from "@/src/types";
+import { pool } from "@/lib";
+import { Room } from "@/types";
 import { CreateRoomInput, UpdateRoomInput } from "./room.schema";
 
 export const getRooms = async (): Promise<Room[]> => {

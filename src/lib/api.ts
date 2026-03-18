@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-export const api = async (url: string, options?: RequestInit) => {
+const api = async (url: string, options?: RequestInit) => {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
@@ -18,3 +18,5 @@ export const api = async (url: string, options?: RequestInit) => {
   }
   return await res.json();
 };
+
+export default api;

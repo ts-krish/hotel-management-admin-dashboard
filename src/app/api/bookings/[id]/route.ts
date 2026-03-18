@@ -1,5 +1,5 @@
-import { updateBookingSchema } from "@/src/modules/bookings";
-import * as bookingService from "@/src/modules/bookings/booking.service";
+import * as bookingService from "@/modules/bookings";
+import { updateBookingSchema } from "@/modules/bookings";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (
