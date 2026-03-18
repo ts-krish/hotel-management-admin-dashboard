@@ -1,22 +1,15 @@
-import { cookies } from "next/headers";
-
 const api = async (url: string, options?: RequestInit) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token");
-
   const res = await fetch(url, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...options?.headers,
-    },
+    credentials: "include", // 🔑 important for cookies
   });
+
   if (!res.ok) {
-    const errorData = await res.json();
-    return errorData;
+    const err = await res.json();
+    throw new Error(err.error || "Request failed");
   }
-  return await res.json();
+
+  return res.json();
 };
 
 export default api;
