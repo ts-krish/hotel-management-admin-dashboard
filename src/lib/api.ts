@@ -1,7 +1,7 @@
 const api = async (url: string, options?: RequestInit) => {
   const res = await fetch(url, {
     ...options,
-    credentials: "include", // 🔑 important for cookies
+    credentials: "include",
   });
 
   if (!res.ok) {

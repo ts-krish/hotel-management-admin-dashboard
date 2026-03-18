@@ -1,8 +1,12 @@
-
+import { Sidebar } from "@/components/layout";
 const page = () => {
   return (
-    <div>Dashboard page</div>
-  )
-}
+    <>
+      <Sidebar />
+      {/* <Navbar />
+      <div>DashBoard</div> */}
+    </>
+  );
+};
 
-export default page
+export default page;
