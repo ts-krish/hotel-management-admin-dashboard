@@ -1,12 +1,13 @@
 "use client";
 
 import { CircleUserRound } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-const Navbar = ({ title, email }: { title: string; email: string }) => {
+const Navbar = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogOut = async () => {
     try {
@@ -15,10 +16,17 @@ const Navbar = ({ title, email }: { title: string; email: string }) => {
     } catch {}
   };
 
+  const getTitle = () => {
+    if (pathname.includes("rooms")) return "Room Management";
+    if (pathname.includes("bookings")) return "Booking Management";
+    if (pathname.includes("guests")) return "Guest Management";
+    return "Dashboard";
+  };
+
   return (
     <nav className="w-full border border-b-gray-300 p-4 bg-white">
       <div className="flex justify-between items-center w-full">
-        <p className="font-semibold text-2xl">{title}</p>
+        <p className="font-semibold text-2xl">{getTitle()}</p>
 
         <div
           className="relative px-3 flex items-center gap-2 cursor-pointer hover:bg-emerald-100"
@@ -44,7 +52,7 @@ const Navbar = ({ title, email }: { title: string; email: string }) => {
           )}
 
           <CircleUserRound size={36} color="#2ec27e" />
-          <p className="text-sm">{email}</p>
+          <p className="text-sm">admin@gmail.com</p>
         </div>
       </div>
     </nav>
