@@ -3,7 +3,7 @@ import pool from "@/lib/db";
 export const findAdmin = async (email: string) => {
   const result = await pool.query(
     `
-    SELECT user_id, role, email, password
+    SELECT user_id, email, password
     FROM users
     WHERE email = $1
     `,

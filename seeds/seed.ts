@@ -28,8 +28,8 @@ const seed = async () => {
     `);
 
     await pool.query(`
-      INSERT INTO users (role,email,password)
-      VALUES ('admin','admin@gmail.com','$2b$10$7nLAkUfQ.Lzv9WcGmc/AlOPoFkb.Wxk9loy2bfzbsFoxRDlxEfA5K')
+      INSERT INTO users (email,password)
+      VALUES ('admin@gmail.com','$2b$10$7nLAkUfQ.Lzv9WcGmc/AlOPoFkb.Wxk9loy2bfzbsFoxRDlxEfA5K')
       `);
 
     console.log("Seed data inserted successfully");

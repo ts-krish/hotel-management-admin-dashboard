@@ -3,8 +3,17 @@ import * as bookingService from "@/modules/bookings/booking.service";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
-  const bookings = await bookingService.listBookings();
-  return NextResponse.json(bookings, { status: 200 });
+  try {
+    const bookings = await bookingService.listBookings();
+    return NextResponse.json(bookings, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/bookings:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch bookings" },
+      { status: 500 },
+    );
+  }
 };
 
 export const POST = async (req: Request) => {

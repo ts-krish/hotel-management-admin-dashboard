@@ -1,24 +1,36 @@
 import jwt from "jsonwebtoken";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const proxy = (req: Request) => {
-  const authHeader = req.headers.get("authorization");
+export const proxy = async (request: NextRequest) => {
+  const token = request.cookies.get("token")?.value;
+  const isApi = request.nextUrl.pathname.startsWith("/api");
 
-  if (!authHeader)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!token) {
+    if (isApi) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
-  const token = authHeader.split(" ")[1];
   if (!process.env.JWT_SECRET_KEY)
     return NextResponse.json({ error: "No secret key found" }, { status: 500 });
   try {
     jwt.verify(token, process.env.JWT_SECRET_KEY!);
     return NextResponse.next();
   } catch (error) {
-    console.log(error);
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    console.error(error);
+    if (isApi) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 };
 
 export const config = {
-  matcher: ["/api/rooms/:path*", "/api/guests/:path*", "/api/bookings/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/api/rooms/:path*",
+    "/api/guests/:path*",
+    "/api/bookings/:path*",
+  ],
 };

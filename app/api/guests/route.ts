@@ -3,8 +3,17 @@ import * as guestService from "@/modules/guests/guest.service";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
-  const guests = await guestService.listGuests();
-  return NextResponse.json(guests, { status: 200 });
+  try {
+    const guests = await guestService.listGuests();
+    return NextResponse.json(guests, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/guests:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch guests" },
+      { status: 500 }
+    );
+  }
 };
 
 export const POST = async (req: Request) => {

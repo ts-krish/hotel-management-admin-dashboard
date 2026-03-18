@@ -14,11 +14,7 @@ export const login = async ({ email, password }: LoginInput) => {
     throw new Error("No Secret key found.");
   }
 
-  const token = jwt.sign(
-    { userId: admin.user_id },
-    process.env.JWT_SECRET_KEY,
-    { expiresIn: "1d" },
-  );
+  const token = jwt.sign({ userId: admin.user_id }, process.env.JWT_SECRET_KEY);
 
   return token;
 };

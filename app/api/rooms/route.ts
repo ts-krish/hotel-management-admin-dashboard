@@ -3,8 +3,17 @@ import { createRoomSchema } from "@/modules/rooms/room.schema";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
-  const rooms = await roomService.listRooms();
-  return NextResponse.json(rooms, { status: 200 });
+  try {
+    const rooms = await roomService.listRooms();
+    return NextResponse.json(rooms, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/rooms:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch rooms" },
+      { status: 500 },
+    );
+  }
 };
 
 export const POST = async (req: Request): Promise<NextResponse> => {
@@ -17,7 +26,7 @@ export const POST = async (req: Request): Promise<NextResponse> => {
     const newRoom = await roomService.addRoom(parsed.data);
     return NextResponse.json(newRoom, { status: 201 });
   } catch (error) {
-    console.error("POST /guests", error);
+    console.error("POST /rooms", error);
     return NextResponse.json(
       { error: "Failed to create room" },
       { status: 500 },

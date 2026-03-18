@@ -9,6 +9,11 @@ export const PATCH = async (
   try {
     const { id } = await params;
     const bookingId = Number(id);
+    if (isNaN(bookingId))
+      return NextResponse.json(
+        { error: "Id should be a number" },
+        { status: 400 },
+      );
     const body = await req.json();
     const parsed = updateBookingSchema.safeParse(body);
 
@@ -26,7 +31,7 @@ export const PATCH = async (
     }
 
     return NextResponse.json(updatedBooking);
-  } catch(error) {
+  } catch (error) {
     console.error("PATCH /bookings/[id]:", error);
     return NextResponse.json(
       { error: "Failed to update booking" },
@@ -53,7 +58,7 @@ export const DELETE = async (
       { message: "Booking deleted successfully" },
       { status: 200 },
     );
-  } catch(error) {
+  } catch (error) {
     console.error("DELETE /bookings/[id]:", error);
     return NextResponse.json(
       { error: "Failed to delete booking" },

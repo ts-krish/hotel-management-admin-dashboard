@@ -10,6 +10,12 @@ export const PATCH = async (
     const { id } = await params;
     const guestId = Number(id);
 
+    if (isNaN(guestId))
+      return NextResponse.json(
+        { error: "Id should be a number" },
+        { status: 400 },
+      );
+
     const body = await req.json();
     const parsed = updateGuestSchema.safeParse(body);
 

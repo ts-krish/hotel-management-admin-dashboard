@@ -8,14 +8,33 @@ export const POST = async (req: Request) => {
     const parsed = loginSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: parsed.error.issues },
+        { status: 400 }
+      );
     }
 
     const token = await login(parsed.data);
 
-    return NextResponse.json({ token }, { status: 200 });
+    const response = NextResponse.json(
+      { message: "Logged in successfully" },
+      { status: 200 }
+    );
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", 
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
+    return response;
   } catch (error) {
-    console.log("POST /auth/login:", error);
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    console.error("POST /auth/login:", error);
+    return NextResponse.json(
+      { error: "Invalid credentials" },
+      { status: 500 }
+    );
   }
 };
