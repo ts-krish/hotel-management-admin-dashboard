@@ -3,6 +3,7 @@
 import { Button, Form, Input } from "@/components/ui";
 import useForm from "@/hooks/useForm";
 import { LoginInput, loginSchema } from "@/modules/auth/auth.schema";
+import { Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
@@ -41,21 +42,7 @@ const LoginPage = () => {
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
       <div className="w-full max-w-sm">
         <div className="mx-auto mb-4 flex h-15 w-15 items-center justify-center rounded-xl bg-teal-600">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8 text-white font-extrabold"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"
-            />
-          </svg>
+          <Building2 size={40} color="white" />
         </div>
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">

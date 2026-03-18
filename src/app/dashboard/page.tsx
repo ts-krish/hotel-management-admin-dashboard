@@ -1,11 +1,14 @@
-import { Sidebar } from "@/components/layout";
+import { Sidebar, Navbar } from "@/components/layout";
 const page = () => {
   return (
-    <>
-      <Sidebar />
-      {/* <Navbar />
-      <div>DashBoard</div> */}
-    </>
+    <main>
+      <div className="flex">
+        <Sidebar />
+        <div className="w-full">
+          <Navbar title="Dashboard" email="admin@gmail.com" />
+        </div>
+      </div>
+    </main>
   );
 };
 
