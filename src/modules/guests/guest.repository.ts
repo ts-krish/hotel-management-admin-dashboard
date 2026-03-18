@@ -1,4 +1,4 @@
-import pool from "@/lib/db";
+import pool from "@/src/lib/db";
 import { CreateGuestInput, UpdateGuestInput } from "./guest.schema";
 
 export const getGuests = async () => {

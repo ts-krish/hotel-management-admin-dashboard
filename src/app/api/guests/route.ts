@@ -1,5 +1,5 @@
-import { createGuestSchema } from "@/modules/guests";
-import * as guestService from "@/modules/guests/guest.service";
+import { createGuestSchema } from "@/src/modules/guests";
+import * as guestService from "@/src/modules/guests/guest.service";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
@@ -11,7 +11,7 @@ export const GET = async () => {
 
     return NextResponse.json(
       { error: "Failed to fetch guests" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

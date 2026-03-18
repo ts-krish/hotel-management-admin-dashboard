@@ -1,5 +1,5 @@
-import pool from "@/lib/db";
-import { Booking } from "@/types";
+import pool from "@/src/lib/db";
+import { Booking } from "@/src/types";
 import { CreateBookingInput, UpdateBookingInput } from "./booking.schema";
 
 export const getBookings = async (): Promise<Booking[]> => {

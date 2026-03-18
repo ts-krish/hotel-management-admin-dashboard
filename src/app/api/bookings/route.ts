@@ -1,5 +1,5 @@
-import { createBookingSchema } from "@/modules/bookings";
-import * as bookingService from "@/modules/bookings/booking.service";
+import { createBookingSchema } from "@/src/modules/bookings";
+import * as bookingService from "@/src/modules/bookings/booking.service";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {

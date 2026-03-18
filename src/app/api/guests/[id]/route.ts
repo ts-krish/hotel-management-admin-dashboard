@@ -1,5 +1,5 @@
-import { updateGuestSchema } from "@/modules/guests";
-import * as guestService from "@/modules/guests/guest.service";
+import { updateGuestSchema } from "@/src/modules/guests";
+import * as guestService from "@/src/modules/guests/guest.service";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (

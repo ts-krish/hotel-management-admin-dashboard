@@ -1,5 +1,5 @@
-import pool from "@/lib/db";
-import { Room } from "@/types";
+import pool from "@/src/lib/db";
+import { Room } from "@/src/types";
 import { CreateRoomInput, UpdateRoomInput } from "./room.schema";
 
 export const getRooms = async (): Promise<Room[]> => {
@@ -21,7 +21,7 @@ export const insertRoom = async (data: CreateRoomInput): Promise<Room> => {
     VALUES ($1, $2::room_category, $3, $4::room_status)
     RETURNING *
     `,
-    [room_number, room_type, price_per_night, status]
+    [room_number, room_type, price_per_night, status],
   );
 
   return newRoom.rows[0];
@@ -29,7 +29,7 @@ export const insertRoom = async (data: CreateRoomInput): Promise<Room> => {
 
 export const updateRoom = async (
   roomId: number,
-  data: UpdateRoomInput
+  data: UpdateRoomInput,
 ): Promise<Room | null> => {
   const { room_number, room_type, price_per_night, status } = data;
 
@@ -50,7 +50,7 @@ export const updateRoom = async (
       price_per_night ?? null,
       status ?? null,
       roomId,
-    ]
+    ],
   );
 
   return result.rows[0] ?? null;
@@ -63,7 +63,7 @@ export const deleteRoom = async (roomId: number): Promise<boolean> => {
     WHERE room_id = $1
     RETURNING room_id
     `,
-    [roomId]
+    [roomId],
   );
 
   return result.rowCount === 1;

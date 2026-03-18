@@ -1,5 +1,5 @@
-import * as roomService from "@/modules/rooms";
-import { createRoomSchema } from "@/modules/rooms/room.schema";
+import * as roomService from "@/src/modules/rooms";
+import { createRoomSchema } from "@/src/modules/rooms/room.schema";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
