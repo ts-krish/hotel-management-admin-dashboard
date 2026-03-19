@@ -331,7 +331,7 @@ const RoomPage = () => {
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>
-                            Edit Room #{room.room_number}
+                            Edit Room
                           </DialogTitle>
                         </DialogHeader>
                         <RoomForm
@@ -370,11 +370,10 @@ const RoomPage = () => {
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>
-                            Delete Room #{room.room_number}?
+                            Delete Room ?
                           </AlertDialogTitle>
                           <AlertDialogDescription>
-                            This action cannot be undone. The room will be
-                            permanently removed.
+                            Are you sure you want to delete room {room.room_number}? This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

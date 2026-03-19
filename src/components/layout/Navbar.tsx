@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,8 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 const Navbar = () => {
   const router = useRouter();
@@ -37,8 +37,8 @@ const Navbar = () => {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-gray-100 transition-colors outline-none cursor-pointer">
             <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-teal-600 text-white text-xs font-semibold">
-                AD
+              <AvatarFallback className="bg-emerald-100 text-white text-xs font-semibold">
+                <User color="#2ec27e" />
               </AvatarFallback>
             </Avatar>
             <span className="text-sm text-zinc-700">admin@gmail.com</span>
