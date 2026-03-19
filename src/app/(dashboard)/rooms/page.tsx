@@ -46,7 +46,6 @@ import {
 } from "@/components/ui/table";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 
-// ── Status badge helper ──────────────────────────────────────────────────────
 const statusVariant: Record<
   Room["status"],
   "default" | "destructive" | "secondary" | "outline"
@@ -56,7 +55,6 @@ const statusVariant: Record<
   maintenance: "secondary",
 };
 
-// ── Room Form (shared by Add & Edit dialogs) ─────────────────────────────────
 interface RoomFormProps {
   initialValues: CreateRoomInput;
   onSuccess: () => void;
@@ -96,7 +94,6 @@ const RoomForm = ({
         </div>
       )}
 
-      {/* Room Number */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="room_number">Room Number</Label>
         <Input
@@ -114,7 +111,6 @@ const RoomForm = ({
         )}
       </div>
 
-      {/* Room Type */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="room_type">Room Type</Label>
         <Select
@@ -136,9 +132,8 @@ const RoomForm = ({
         )}
       </div>
 
-      {/* Price per Night */}
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="price_per_night">Price / Night (₹)</Label>
+        <Label htmlFor="price_per_night">Price / Night ($)</Label>
         <Input
           id="price_per_night"
           name="price_per_night"
@@ -154,7 +149,6 @@ const RoomForm = ({
         )}
       </div>
 
-      {/* Status */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="status">Status</Label>
         <Select
@@ -191,7 +185,6 @@ const RoomForm = ({
   );
 };
 
-// ── Main Page ────────────────────────────────────────────────────────────────
 const RoomPage = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -224,7 +217,6 @@ const RoomPage = () => {
 
   return (
     <div className="space-y-4 p-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">
           Manage hotel rooms, pricing, and availability
@@ -264,16 +256,15 @@ const RoomPage = () => {
         </Dialog>
       </div>
 
-      {/* Table */}
       <div className="rounded-lg border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
-              <TableHead>Room Number</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Price / Night</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>ROOM NUMBER</TableHead>
+              <TableHead>TYPE</TableHead>
+              <TableHead>PRICE/NIGHT</TableHead>
+              <TableHead>STATUS</TableHead>
+              <TableHead>ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -313,7 +304,7 @@ const RoomPage = () => {
                   </TableCell>
                   <TableCell className="capitalize">{room.room_type}</TableCell>
                   <TableCell>
-                    ₹{room.price_per_night.toLocaleString()}
+                    ${room.price_per_night.toLocaleString()}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -324,7 +315,6 @@ const RoomPage = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="flex gap-2">
-                    {/* Edit */}
                     <Dialog
                       open={editRoom?.room_id === room.room_id}
                       onOpenChange={(o) => !o && setEditRoom(null)}
@@ -354,7 +344,7 @@ const RoomPage = () => {
                           submitLabel="Save Changes"
                           apiCall={(data) =>
                             api(`/api/rooms/${room.room_id}`, {
-                              method: "PUT",
+                              method: "PATCH",
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify(data),
                             })
@@ -367,7 +357,6 @@ const RoomPage = () => {
                       </DialogContent>
                     </Dialog>
 
-                    {/* Delete */}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
