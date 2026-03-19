@@ -30,6 +30,7 @@ interface UseFormReturn<T extends Record<string, unknown>> {
   handleSubmit: (e: FormEvent<HTMLFormElement>) => Promise<void>;
   setFormError: (msg: string) => void;
   setFormSuccess: (msg: string) => void;
+  setFieldValue: (name: keyof T, value: unknown) => void;
   reset: () => void;
 }
 
@@ -73,6 +74,14 @@ const useForm = <T extends Record<string, unknown>>({
 
     return {};
   };
+
+  const setFieldValue = (name: keyof T, value: unknown) => {
+  const next = { ...values, [name]: value };
+  setValues(next);
+  if (touched[name]) {
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, next) }));
+  }
+};
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -168,6 +177,7 @@ const useForm = <T extends Record<string, unknown>>({
     handleSubmit,
     setFormError,
     setFormSuccess,
+    setFieldValue,
     reset,
   };
 };

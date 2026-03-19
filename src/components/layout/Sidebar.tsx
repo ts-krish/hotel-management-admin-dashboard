@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -23,12 +24,15 @@ const Sidebar = () => {
   return (
     <div className="flex flex-col justify-between w-60 h-screen bg-slate-950 text-white">
       <div>
+        {/* Logo */}
         <div className="flex gap-2 px-4 pt-5 items-center text-lg font-bold mb-4">
           <Building2 size={32} color="#2ec27e" />
           <p>Hotel Admin</p>
         </div>
-        <hr className="border-slate-800 mb-6" />
 
+        <Separator className="bg-slate-800 mb-6" />
+
+        {/* Nav items */}
         <div className="flex flex-col px-4 gap-2">
           {navItems.map((item) => (
             <Link
@@ -46,9 +50,11 @@ const Sidebar = () => {
           ))}
         </div>
       </div>
-      <div className="text-gray-700 text-sm px-2 text-start ">
-        <hr className="border-slate-800" />
-        <p className="py-2">© 2025 Hotel Management</p>
+
+      {/* Footer */}
+      <div className="px-2 text-start">
+        <Separator className="bg-slate-800" />
+        <p className="py-2 text-gray-600 text-sm">© 2025 Hotel Management</p>
       </div>
     </div>
   );
