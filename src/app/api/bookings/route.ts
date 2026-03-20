@@ -1,6 +1,6 @@
+import { yupParse } from "@/lib/yupParse";
 import * as bookingService from "@/modules/bookings";
 import { createBookingSchema } from "@/modules/bookings";
-import { yupParse } from "@/lib/yupParse";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
@@ -9,7 +9,10 @@ export const GET = async () => {
     return NextResponse.json(bookings, { status: 200 });
   } catch (error) {
     console.error("GET /api/bookings:", error);
-    return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch bookings" },
+      { status: 500 },
+    );
   }
 };
 
@@ -17,7 +20,6 @@ export const POST = async (req: Request) => {
   try {
     const body = await req.json();
 
-    // CHANGED: createBookingSchema.safeParse(body) → await yupParse(createBookingSchema, body)
     const parsed = await yupParse(createBookingSchema, body);
 
     if (!parsed.success) {
@@ -28,6 +30,9 @@ export const POST = async (req: Request) => {
     return NextResponse.json(newBooking, { status: 201 });
   } catch (error) {
     console.error("POST /bookings:", error);
-    return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create booking" },
+      { status: 500 },
+    );
   }
 };

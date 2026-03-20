@@ -4,6 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 export const proxy = async (request: NextRequest) => {
   const token = request.cookies.get("token")?.value;
   const isApi = request.nextUrl.pathname.startsWith("/api");
+  
+  if (request.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
   if (!token) {
     if (isApi)
@@ -28,6 +32,7 @@ export const proxy = async (request: NextRequest) => {
 
 export const config = {
   matcher: [
+    "/",
     "/dashboard/:path*",
     "/rooms/:path*",
     "/guests/:path*",
