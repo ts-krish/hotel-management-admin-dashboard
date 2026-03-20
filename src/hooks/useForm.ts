@@ -1,9 +1,10 @@
-import { FormEvent, useState } from "react";
-import { ZodSchema } from "zod";
+import React from "react";
+import { useFormik, FormikHelpers } from "formik";
+import { ObjectSchema, AnyObject } from "yup";
 
-interface UseFormOptions<T extends Record<string, unknown>> {
+interface UseFormOptions<T extends AnyObject> {
   initialValues: T;
-  schema: ZodSchema<T>;
+  schema: ObjectSchema<T>;
   onSubmit: (values: T) => Promise<void> | void;
 }
 
@@ -11,170 +12,93 @@ type FieldErrors<T> = {
   [K in keyof T]?: string;
 };
 
-interface UseFormReturn<T extends Record<string, unknown>> {
+// NEW: expose touched so components can guard "touched.field && errors.field"
+type FieldTouched<T> = {
+  [K in keyof T]?: boolean;
+};
+
+interface UseFormReturn<T extends AnyObject> {
   values: T;
   errors: FieldErrors<T>;
+  touched: FieldTouched<T>; // NEW
   formError: string;
   formSuccess: string;
   isSubmitting: boolean;
   handleChange: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
+    >
   ) => void;
   handleBlur: (
     e: React.FocusEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
+    >
   ) => void;
-  handleSubmit: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   setFormError: (msg: string) => void;
   setFormSuccess: (msg: string) => void;
   setFieldValue: (name: keyof T, value: unknown) => void;
   reset: () => void;
 }
 
-const useForm = <T extends Record<string, unknown>>({
+const useForm = <T extends AnyObject>({
   initialValues,
   schema,
   onSubmit,
 }: UseFormOptions<T>): UseFormReturn<T> => {
-  const [values, setValues] = useState<T>(initialValues);
-  const [errors, setErrors] = useState<FieldErrors<T>>({});
-  const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
-  const [formError, setFormError] = useState("");
-  const [formSuccess, setFormSuccess] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = React.useState("");
+  const [formSuccess, setFormSuccess] = React.useState("");
 
-  // validate single field
-  const validateField = (name: keyof T, currentValues: T): string => {
-    const result = schema.safeParse(currentValues);
-    if (!result.success) {
-      const fieldIssue = result.error.issues.find((i) => i.path[0] === name);
-      return fieldIssue?.message ?? "";
-    }
-    return "";
-  };
+  const formik = useFormik<T>({
+    initialValues,
+    validationSchema: schema,
+    // Only validate a field after the user has blurred it (matches original behaviour).
+    // validateOnChange:true re-validates already-touched fields on each keystroke.
+    validateOnBlur: true,
+    validateOnChange: true,
 
-  // validate all
-  const validateAll = (currentValues: T): FieldErrors<T> => {
-    const result = schema.safeParse(currentValues);
+    onSubmit: async (values: T, helpers: FormikHelpers<T>) => {
+      setFormError("");
+      setFormSuccess("");
+      try {
+        await onSubmit(values);
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : "Something went wrong.";
+        setFormError(message);
+      } finally {
+        helpers.setSubmitting(false);
+      }
+    },
+  });
 
-    if (!result.success) {
-      return result.error.issues.reduce<FieldErrors<T>>((acc, issue) => {
-        const key = issue.path[0] as keyof T;
-
-        if (key && !acc[key]) {
-          acc[key] = issue.message;
-        }
-
-        return acc;
-      }, {});
-    }
-
-    return {};
-  };
+  const errors = formik.errors as FieldErrors<T>;
+  // Expose Formik's touched map with the same shape as our FieldTouched<T>
+  const touched = formik.touched as FieldTouched<T>;
 
   const setFieldValue = (name: keyof T, value: unknown) => {
-  const next = { ...values, [name]: value };
-  setValues(next);
-  if (touched[name]) {
-    setErrors((prev) => ({ ...prev, [name]: validateField(name, next) }));
-  }
-};
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const { name, value, type } = e.target;
-
-    const key = name as keyof T;
-
-    const next = {
-      ...values,
-      [key]: type === "number" ? Number(value) : value,
-    };
-
-    setValues(next);
-
-    if (touched[key]) {
-      setErrors((prev) => ({
-        ...prev,
-        [key]: validateField(key, next),
-      }));
-    }
-  };
-
-  const handleBlur = (
-    e: React.FocusEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const key = e.target.name as keyof T;
-
-    setTouched((prev) => ({ ...prev, [key]: true }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [key]: validateField(key, values),
-    }));
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    setFormError("");
-    setFormSuccess("");
-
-    const allTouched = Object.keys(values).reduce<
-      Partial<Record<keyof T, boolean>>
-    >((acc, k) => {
-      acc[k as keyof T] = true;
-      return acc;
-    }, {});
-
-    setTouched(allTouched);
-
-    const fieldErrors = validateAll(values);
-
-    if (Object.keys(fieldErrors).length > 0) {
-      setErrors(fieldErrors);
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      await onSubmit(values);
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong.";
-      setFormError(message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Pass true to run validation after setting; also mark touched so the
+    // error becomes visible immediately (mirrors Select/DatePicker behaviour).
+    formik.setFieldValue(name as string, value, true);
+    formik.setFieldTouched(name as string, true, false);
   };
 
   const reset = () => {
-    setValues(initialValues);
-    setErrors({});
-    setTouched({});
+    formik.resetForm();
     setFormError("");
     setFormSuccess("");
-    setIsSubmitting(false);
   };
 
   return {
-    values,
+    values: formik.values,
     errors,
+    touched, // NEW
     formError,
     formSuccess,
-    isSubmitting,
-    handleChange,
-    handleBlur,
-    handleSubmit,
+    isSubmitting: formik.isSubmitting,
+    handleChange: formik.handleChange,
+    handleBlur: formik.handleBlur,
+    handleSubmit: formik.handleSubmit,
     setFormError,
     setFormSuccess,
     setFieldValue,

@@ -1,5 +1,6 @@
 import * as bookingService from "@/modules/bookings";
 import { updateBookingSchema } from "@/modules/bookings";
+import { yupParse } from "@/lib/yupParse";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (
@@ -9,22 +10,20 @@ export const PATCH = async (
   try {
     const { id } = await params;
     const bookingId = Number(id);
+
     if (isNaN(bookingId))
-      return NextResponse.json(
-        { error: "Id should be a number" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Id should be a number" }, { status: 400 });
+
     const body = await req.json();
-    const parsed = updateBookingSchema.safeParse(body);
+
+    // CHANGED: updateBookingSchema.safeParse(body) → await yupParse(updateBookingSchema, body)
+    const parsed = await yupParse(updateBookingSchema, body);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+      return NextResponse.json({ error: parsed.errors }, { status: 400 });
     }
 
-    const updatedBooking = await bookingService.modifyBooking(
-      bookingId,
-      parsed.data,
-    );
+    const updatedBooking = await bookingService.modifyBooking(bookingId, parsed.data);
 
     if (!updatedBooking) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
@@ -33,10 +32,7 @@ export const PATCH = async (
     return NextResponse.json(updatedBooking);
   } catch (error) {
     console.error("PATCH /bookings/[id]:", error);
-    return NextResponse.json(
-      { error: "Failed to update booking" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to update booking" }, { status: 500 });
   }
 };
 
@@ -54,15 +50,9 @@ export const DELETE = async (
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    return NextResponse.json(
-      { message: "Booking deleted successfully" },
-      { status: 200 },
-    );
+    return NextResponse.json({ message: "Booking deleted successfully" }, { status: 200 });
   } catch (error) {
     console.error("DELETE /bookings/[id]:", error);
-    return NextResponse.json(
-      { error: "Failed to delete booking" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to delete booking" }, { status: 500 });
   }
 };

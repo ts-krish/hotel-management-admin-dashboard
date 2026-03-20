@@ -15,6 +15,11 @@ const LoginPage = () => {
   const {
     values,
     errors,
+    // CHANGED: destructure `touched` from useForm (new with Formik integration).
+    // Formik only populates errors for a field after it has been blurred,
+    // but we must also check `touched` before showing the error message so
+    // we never flash validation errors on fields the user hasn't visited yet.
+    touched,
     formError,
     isSubmitting,
     handleChange,
@@ -62,7 +67,7 @@ const LoginPage = () => {
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
-              {/* Form-level error */}
+              {/* Form-level error — unchanged */}
               {formError && (
                 <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
                   {formError}
@@ -80,10 +85,14 @@ const LoginPage = () => {
                   value={values.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={errors.email ? "border-red-400 focus-visible:ring-red-300" : ""}
-                  required
+                  // CHANGED: gate className and error message on `touched.email`
+                  // so the red border only appears after the user has blurred the field.
+                  // Before: className={errors.email ? "border-red-400 ..." : ""}
+                  // After:  className={touched.email && errors.email ? "..." : ""}
+                  className={touched.email && errors.email ? "border-red-400 focus-visible:ring-red-300" : ""}
                 />
-                {errors.email && (
+                {/* CHANGED: show error only when field is touched */}
+                {touched.email && errors.email && (
                   <p className="text-xs text-red-500">{errors.email}</p>
                 )}
               </div>
@@ -99,15 +108,16 @@ const LoginPage = () => {
                   value={values.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={errors.password ? "border-red-400 focus-visible:ring-red-300" : ""}
-                  required
+                  // CHANGED: gate on touched.password
+                  className={touched.password && errors.password ? "border-red-400 focus-visible:ring-red-300" : ""}
                 />
-                {errors.password && (
+                {/* CHANGED: show error only when field is touched */}
+                {touched.password && errors.password && (
                   <p className="text-xs text-red-500">{errors.password}</p>
                 )}
               </div>
 
-              {/* Submit */}
+              {/* Submit — unchanged */}
               <Button
                 type="submit"
                 disabled={isSubmitting}

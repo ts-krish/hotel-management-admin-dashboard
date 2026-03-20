@@ -1,9 +1,17 @@
+// CHANGED: Replaced Zod schema dependency with Yup schema
+// This hook is a standalone per-field validator (not used by main forms,
+// but exported from hooks/index.ts for potential consumer use).
+//
+// Before: import { ZodSchema } from "zod"  +  schema.safeParse(val)
+// After:  import { Schema } from "yup"     +  schema.isValidSync(val) / validateSync()
+
 import { ChangeEvent, useState } from "react";
-import { ZodSchema } from "zod";
+import { Schema } from "yup";
 
 interface UseInputOptions<T> {
   initialValue?: T;
-  schema?: ZodSchema<T>;       // optional per-field Zod schema for instant validation
+  // CHANGED: schema type from ZodSchema<T> to Yup Schema<T>
+  schema?: Schema<T>;       // optional per-field Yup schema for instant validation
   validateOnChange?: boolean;  // default: false — validate only on blur
 }
 
@@ -27,20 +35,24 @@ const useInput = <T extends string | number = string>({
   const [error, setError] = useState("");
   const [touched, setTouched] = useState(false);
 
+  // CHANGED: replaced schema.safeParse(val) (Zod) with schema.validateSync(val) (Yup)
+  // Yup's validateSync throws on failure — we catch it to extract the message,
+  // mirroring how the old code extracted result.error.issues[0]?.message.
   const validate = (val: T): string => {
     if (!schema) return "";
-    const result = schema.safeParse(val);
-    if (!result.success) {
-      return result.error.issues[0]?.message ?? "Invalid value";
+    try {
+      schema.validateSync(val);
+      return "";
+    } catch (err: unknown) {
+      if (err instanceof Error) return err.message;
+      return "Invalid value";
     }
-    return "";
   };
 
   const onChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const raw = e.target.value;
-    // preserve number type if initialValue was a number
     const next = (typeof initialValue === "number" ? Number(raw) : raw) as T;
     setValue(next);
 

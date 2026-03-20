@@ -67,6 +67,10 @@ const GuestForm = ({
   const {
     values,
     errors,
+    // CHANGED: destructure `touched` — required to gate error visibility.
+    // Formik only marks a field touched after blur or form submit, so without
+    // this check errors would appear before the user has interacted with the field.
+    touched,
     formError,
     isSubmitting,
     handleChange,
@@ -89,6 +93,7 @@ const GuestForm = ({
         </div>
       )}
 
+      {/* Full Name */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="full_name">Full Name</Label>
         <Input
@@ -98,13 +103,18 @@ const GuestForm = ({
           value={values.full_name}
           onChange={handleChange}
           onBlur={handleBlur}
-          className={errors.full_name ? "border-red-400" : ""}
+          // CHANGED: gate red border on touched.full_name
+          // Before: className={errors.full_name ? "border-red-400" : ""}
+          // After:  className={touched.full_name && errors.full_name ? "..." : ""}
+          className={touched.full_name && errors.full_name ? "border-red-400" : ""}
         />
-        {errors.full_name && (
+        {/* CHANGED: gate error message on touched */}
+        {touched.full_name && errors.full_name && (
           <p className="text-xs text-red-500">{errors.full_name}</p>
         )}
       </div>
 
+      {/* Email */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -115,11 +125,16 @@ const GuestForm = ({
           value={values.email}
           onChange={handleChange}
           onBlur={handleBlur}
-          className={errors.email ? "border-red-400" : ""}
+          // CHANGED: gate on touched.email
+          className={touched.email && errors.email ? "border-red-400" : ""}
         />
-        {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
+        {/* CHANGED: gate error message on touched */}
+        {touched.email && errors.email && (
+          <p className="text-xs text-red-500">{errors.email}</p>
+        )}
       </div>
 
+      {/* Phone Number — optional field */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="phone_number">Phone Number</Label>
         <Input
@@ -129,13 +144,16 @@ const GuestForm = ({
           value={values.phone_number ?? ""}
           onChange={handleChange}
           onBlur={handleBlur}
-          className={errors.phone_number ? "border-red-400" : ""}
+          // CHANGED: gate on touched.phone_number
+          className={touched.phone_number && errors.phone_number ? "border-red-400" : ""}
         />
-        {errors.phone_number && (
+        {/* CHANGED: gate error message on touched */}
+        {touched.phone_number && errors.phone_number && (
           <p className="text-xs text-red-500">{errors.phone_number}</p>
         )}
       </div>
 
+      {/* Submit — unchanged */}
       <Button
         type="submit"
         disabled={isSubmitting}
@@ -154,6 +172,7 @@ const GuestForm = ({
   );
 };
 
+// ── Guest Detail (read-only, no form) — unchanged ────────────────────────────
 const GuestDetailContent = ({ guest }: { guest: Guest }) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -247,6 +266,7 @@ const GuestDetailContent = ({ guest }: { guest: Guest }) => {
   );
 };
 
+// ── Guest Page (table + dialogs) — unchanged ─────────────────────────────────
 const GuestPage = () => {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [loading, setLoading] = useState(true);

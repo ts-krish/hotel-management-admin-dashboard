@@ -71,6 +71,10 @@ const RoomForm = ({
   const {
     values,
     errors,
+    // CHANGED: destructure `touched` — needed to gate error display per field.
+    // Formik sets touched[field]=true only after the user blurs or submits,
+    // so without this check, errors would flash on untouched fields.
+    touched,
     formError,
     isSubmitting,
     handleChange,
@@ -94,6 +98,7 @@ const RoomForm = ({
         </div>
       )}
 
+      {/* Room Number */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="room_number">Room Number</Label>
         <Input
@@ -104,13 +109,18 @@ const RoomForm = ({
           value={values.room_number || ""}
           onChange={handleChange}
           onBlur={handleBlur}
-          className={errors.room_number ? "border-red-400" : ""}
+          // CHANGED: gate error styling on touched.room_number
+          // Before: className={errors.room_number ? "border-red-400" : ""}
+          // After:  className={touched.room_number && errors.room_number ? "..." : ""}
+          className={touched.room_number && errors.room_number ? "border-red-400" : ""}
         />
-        {errors.room_number && (
+        {/* CHANGED: gate error message on touched */}
+        {touched.room_number && errors.room_number && (
           <p className="text-xs text-red-500">{errors.room_number}</p>
         )}
       </div>
 
+      {/* Room Type — uses setFieldValue (Select has no native onChange with name) */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="room_type">Room Type</Label>
         <Select
@@ -118,7 +128,8 @@ const RoomForm = ({
           value={values.room_type}
           onValueChange={(val) => setFieldValue("room_type", val)}
         >
-          <SelectTrigger className={errors.room_type ? "border-red-400" : ""}>
+          {/* CHANGED: gate border on touched.room_type */}
+          <SelectTrigger className={touched.room_type && errors.room_type ? "border-red-400" : ""}>
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
@@ -127,11 +138,13 @@ const RoomForm = ({
             <SelectItem value="deluxe">Deluxe</SelectItem>
           </SelectContent>
         </Select>
-        {errors.room_type && (
+        {/* CHANGED: gate error message on touched */}
+        {touched.room_type && errors.room_type && (
           <p className="text-xs text-red-500">{errors.room_type}</p>
         )}
       </div>
 
+      {/* Price per Night */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="price_per_night">Price / Night ($)</Label>
         <Input
@@ -142,13 +155,16 @@ const RoomForm = ({
           value={values.price_per_night || ""}
           onChange={handleChange}
           onBlur={handleBlur}
-          className={errors.price_per_night ? "border-red-400" : ""}
+          // CHANGED: gate on touched.price_per_night
+          className={touched.price_per_night && errors.price_per_night ? "border-red-400" : ""}
         />
-        {errors.price_per_night && (
+        {/* CHANGED: gate error message on touched */}
+        {touched.price_per_night && errors.price_per_night && (
           <p className="text-xs text-red-500">{errors.price_per_night}</p>
         )}
       </div>
 
+      {/* Status — optional field, no error display needed */}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="status">Status</Label>
         <Select
@@ -167,6 +183,7 @@ const RoomForm = ({
         </Select>
       </div>
 
+      {/* Submit — unchanged */}
       <Button
         type="submit"
         disabled={isSubmitting}
@@ -330,9 +347,7 @@ const RoomPage = () => {
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>
-                            Edit Room
-                          </DialogTitle>
+                          <DialogTitle>Edit Room</DialogTitle>
                         </DialogHeader>
                         <RoomForm
                           initialValues={{
@@ -369,9 +384,7 @@ const RoomPage = () => {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Delete Room ?
-                          </AlertDialogTitle>
+                          <AlertDialogTitle>Delete Room?</AlertDialogTitle>
                           <AlertDialogDescription>
                             Are you sure you want to delete room {room.room_number}? This action cannot be undone.
                           </AlertDialogDescription>

@@ -1,5 +1,6 @@
 import * as roomService from "@/modules/rooms";
 import { updateRoomSchema } from "@/modules/rooms";
+import { yupParse } from "@/lib/yupParse";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (
@@ -11,16 +12,17 @@ export const PATCH = async (
     const roomId = Number(id);
 
     if (isNaN(roomId))
-      return NextResponse.json(
-        { error: "Id should be a number" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Id should be a number" }, { status: 400 });
+
     const body = await req.json();
-    const parsed = updateRoomSchema.safeParse(body);
+
+    // CHANGED: updateRoomSchema.safeParse(body) → await yupParse(updateRoomSchema, body)
+    const parsed = await yupParse(updateRoomSchema, body);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
+      return NextResponse.json({ error: parsed.errors }, { status: 400 });
     }
+
     const updatedRoom = await roomService.modifyRoom(roomId, parsed.data);
 
     if (!updatedRoom) {
@@ -30,10 +32,7 @@ export const PATCH = async (
     return NextResponse.json(updatedRoom);
   } catch (error) {
     console.error("PATCH /rooms/[id]:", error);
-    return NextResponse.json(
-      { error: "Failed to update room" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to update room" }, { status: 500 });
   }
 };
 
@@ -51,15 +50,9 @@ export const DELETE = async (
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    return NextResponse.json(
-      { message: "Room deleted successfully" },
-      { status: 200 },
-    );
+    return NextResponse.json({ message: "Room deleted successfully" }, { status: 200 });
   } catch (error) {
     console.error("DELETE /room/[id]:", error);
-    return NextResponse.json(
-      { error: "Failed to delete room" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to delete room" }, { status: 500 });
   }
 };

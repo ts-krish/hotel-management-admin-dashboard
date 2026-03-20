@@ -65,6 +65,7 @@ import {
   User,
 } from "lucide-react";
 
+// ── Status display maps — unchanged ──────────────────────────────────────────
 const statusVariant: Record<
   Booking["status"],
   "default" | "destructive" | "secondary" | "outline"
@@ -104,18 +105,8 @@ const statusTextColor: Record<Booking["status"], string> = {
 };
 
 const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
 
 const toDateStr = (d: Date) =>
@@ -123,6 +114,7 @@ const toDateStr = (d: Date) =>
 
 const toDateInput = (s: string) => s?.slice(0, 10) ?? "";
 
+// ── BookingForm ───────────────────────────────────────────────────────────────
 interface BookingFormProps {
   initialValues: CreateBookingInput;
   onSuccess: () => void;
@@ -143,9 +135,11 @@ const BookingForm = ({
   const {
     values,
     errors,
+    // CHANGED: destructure `touched` — needed for all error display guards.
+    // Formik populates errors eagerly but only shows them once the field is touched.
+    touched,
     formError,
     isSubmitting,
-    handleChange,
     handleBlur,
     handleSubmit,
     setFieldValue,
@@ -158,6 +152,14 @@ const BookingForm = ({
     },
   });
 
+  // Pre-compute touched+error guards to keep JSX concise.
+  // CHANGED: all error display now gated on touched — before it was errors.field alone.
+  const showGuestError    = touched.guest_id      && errors.guest_id;
+  const showRoomError     = touched.room_id        && errors.room_id;
+  const showCheckInError  = touched.check_in_date  && errors.check_in_date;
+  const showCheckOutError = touched.check_out_date && errors.check_out_date;
+  const showStatusError   = touched.status         && errors.status;
+
   const availableRooms = rooms.filter((r) => r.status === "available");
 
   return (
@@ -168,13 +170,15 @@ const BookingForm = ({
         </div>
       )}
 
+      {/* Guest — Select uses setFieldValue, not handleChange */}
       <div className="flex flex-col gap-1.5">
         <Label>Guest</Label>
         <Select
           value={values.guest_id ? String(values.guest_id) : ""}
           onValueChange={(v) => setFieldValue("guest_id", Number(v))}
         >
-          <SelectTrigger className={errors.guest_id ? "border-red-400" : ""}>
+          {/* CHANGED: gate border on showGuestError */}
+          <SelectTrigger className={showGuestError ? "border-red-400" : ""}>
             <SelectValue placeholder="Select a guest" />
           </SelectTrigger>
           <SelectContent>
@@ -185,26 +189,26 @@ const BookingForm = ({
             ))}
           </SelectContent>
         </Select>
-        {errors.guest_id && (
+        {/* CHANGED: gate error message on showGuestError */}
+        {showGuestError && (
           <p className="text-xs text-red-500">{errors.guest_id}</p>
         )}
       </div>
 
-      {/* Room */}
+      {/* Room — Select uses setFieldValue */}
       <div className="flex flex-col gap-1.5">
         <Label>Room</Label>
         <Select
           value={values.room_id ? String(values.room_id) : ""}
           onValueChange={(v) => setFieldValue("room_id", Number(v))}
         >
-          <SelectTrigger className={errors.room_id ? "border-red-400" : ""}>
+          {/* CHANGED: gate border on showRoomError */}
+          <SelectTrigger className={showRoomError ? "border-red-400" : ""}>
             <SelectValue placeholder="Select a room" />
           </SelectTrigger>
           <SelectContent>
             {availableRooms.length === 0 ? (
-              <SelectItem value="none" disabled>
-                No available rooms
-              </SelectItem>
+              <SelectItem value="none" disabled>No available rooms</SelectItem>
             ) : (
               availableRooms.map((r) => (
                 <SelectItem key={r.room_id} value={String(r.room_id)}>
@@ -222,7 +226,8 @@ const BookingForm = ({
             )}
           </SelectContent>
         </Select>
-        {errors.room_id && (
+        {/* CHANGED: gate error message on showRoomError */}
+        {showRoomError && (
           <p className="text-xs text-red-500">{errors.room_id}</p>
         )}
       </div>
@@ -240,12 +245,25 @@ const BookingForm = ({
                 ? toDateInput(String(values.check_in_date))
                 : ""
             }
-            onChange={handleChange}
+            // CHANGED: type="date" inputs give a "YYYY-MM-DD" string, but our
+            // Yup schema uses Yup.date() which expects a real Date object.
+            // Using handleChange would store the raw string and cause Yup to
+            // fail or coerce unexpectedly, so we call setFieldValue with
+            // new Date(value) instead. setFieldValue also marks the field
+            // as touched, triggering validation immediately on change.
+            onChange={(e) =>
+              setFieldValue(
+                "check_in_date",
+                e.target.value ? new Date(e.target.value) : null
+              )
+            }
             onBlur={handleBlur}
-            className={errors.check_in_date ? "border-red-400" : ""}
+            // CHANGED: gate border on showCheckInError
+            className={showCheckInError ? "border-red-400" : ""}
           />
-          {errors.check_in_date && (
-            <p className="text-xs text-red-500">{errors.check_in_date}</p>
+          {/* CHANGED: gate error message on showCheckInError */}
+          {showCheckInError && (
+            <p className="text-xs text-red-500">{errors.check_in_date as string}</p>
           )}
         </div>
         <div className="flex flex-col gap-1.5">
@@ -259,23 +277,33 @@ const BookingForm = ({
                 ? toDateInput(String(values.check_out_date))
                 : ""
             }
-            onChange={handleChange}
+            // CHANGED: same Date conversion as check_in_date above
+            onChange={(e) =>
+              setFieldValue(
+                "check_out_date",
+                e.target.value ? new Date(e.target.value) : null
+              )
+            }
             onBlur={handleBlur}
-            className={errors.check_out_date ? "border-red-400" : ""}
+            // CHANGED: gate border on showCheckOutError
+            className={showCheckOutError ? "border-red-400" : ""}
           />
-          {errors.check_out_date && (
-            <p className="text-xs text-red-500">{errors.check_out_date}</p>
+          {/* CHANGED: gate error message on showCheckOutError */}
+          {showCheckOutError && (
+            <p className="text-xs text-red-500">{errors.check_out_date as string}</p>
           )}
         </div>
       </div>
 
+      {/* Status — Select uses setFieldValue */}
       <div className="flex flex-col gap-1.5">
         <Label>Status</Label>
         <Select
           value={values.status}
           onValueChange={(v) => setFieldValue("status", v)}
         >
-          <SelectTrigger className={errors.status ? "border-red-400" : ""}>
+          {/* CHANGED: gate border on showStatusError */}
+          <SelectTrigger className={showStatusError ? "border-red-400" : ""}>
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
           <SelectContent>
@@ -285,11 +313,13 @@ const BookingForm = ({
             <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
-        {errors.status && (
+        {/* CHANGED: gate error message on showStatusError */}
+        {showStatusError && (
           <p className="text-xs text-red-500">{errors.status}</p>
         )}
       </div>
 
+      {/* Submit — unchanged */}
       <Button
         type="submit"
         disabled={isSubmitting}
@@ -308,6 +338,7 @@ const BookingForm = ({
   );
 };
 
+// ── DayDetailContent (read-only, no form) — unchanged ────────────────────────
 interface DayDetailProps {
   date: Date;
   bookings: Booking[];
@@ -344,7 +375,6 @@ const DayDetailContent = ({
             <div key={b.booking_id}>
               {i > 0 && <Separator className="mb-3" />}
               <div className={`rounded-lg border p-4 ${statusBg[b.status]}`}>
-                {/* Status + ID */}
                 <div className="flex items-center justify-between mb-3">
                   <span
                     className={`text-xs font-semibold uppercase tracking-wide ${statusTextColor[b.status]}`}
@@ -409,6 +439,7 @@ const DayDetailContent = ({
   );
 };
 
+// ── CalendarView (no form, unchanged) ────────────────────────────────────────
 interface CalendarViewProps {
   bookings: Booking[];
   guestMap: Record<number, string>;
@@ -539,7 +570,6 @@ const CalendarView = ({ bookings, guestMap, roomMap }: CalendarViewProps) => {
         </div>
       </div>
 
-      {/* ── shadcn Calendar with custom DayButton + suppressed built-in nav ── */}
       <Calendar
         mode="single"
         onMonthChange={setMonth}
@@ -571,7 +601,6 @@ const CalendarView = ({ bookings, guestMap, roomMap }: CalendarViewProps) => {
         }}
       />
 
-      {/* ── Legend ── */}
       <div className="flex flex-wrap items-center gap-5 px-5 py-3 bg-gray-50 border-t">
         {(Object.keys(statusDot) as Booking["status"][]).map((s) => (
           <div key={s} className="flex items-center gap-1.5">
@@ -595,6 +624,7 @@ const CalendarView = ({ bookings, guestMap, roomMap }: CalendarViewProps) => {
   );
 };
 
+// ── BookingPage (table + calendar + dialogs) ──────────────────────────────────
 const BookingPage = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -671,7 +701,6 @@ const BookingPage = () => {
           </Button>
         </div>
 
-        {/* New booking */}
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
             <Button className="bg-teal-600 hover:bg-teal-700 text-white cursor-pointer">
@@ -709,7 +738,7 @@ const BookingPage = () => {
         </Dialog>
       </div>
 
-      {/* ── Calendar view ── */}
+      {/* Calendar view */}
       {view === "calendar" && loading && (
         <div className="rounded-lg border p-4 space-y-3">
           <Skeleton className="h-8 w-48" />
@@ -728,7 +757,7 @@ const BookingPage = () => {
         />
       )}
 
-      {/* ── Table view ── */}
+      {/* Table view */}
       {view === "table" && (
         <div className="rounded-lg border overflow-hidden">
           <Table>
@@ -829,9 +858,7 @@ const BookingPage = () => {
                             apiCall={(data) =>
                               api(`/api/bookings/${booking.booking_id}`, {
                                 method: "PATCH",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                },
+                                headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify(data),
                               })
                             }
