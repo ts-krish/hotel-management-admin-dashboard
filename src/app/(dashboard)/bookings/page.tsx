@@ -467,14 +467,14 @@ const CalendarView = ({ bookings, guestMap, roomMap }: CalendarViewProps) => {
         {...buttonProps}
         onClick={() => handleDayClick(date)}
         className={`
-          w-full h-full ring ring-gray-100 min-h-20 flex flex-col items-start p-1.5 rounded-md text-left
-          transition-colors hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-teal-400
+          w-full h-full ring ring-gray-100 min-h-25 flex flex-col items-start p-1.5 rounded-md text-left
+          transition-colors hover:bg-gray-50 hover:cursor-pointer focus:outline-none focus:ring-1 focus:ring-teal-400
           ${isOutside ? "opacity-30" : ""}
         `}
-      > 
+      >
         <span
           className={`
-            text-xs font-medium leading-none mb-1.5 h-5 w-5 flex items-center
+            text-sm font-medium leading-none mb-1.5 h-7 w-7 flex items-center
             justify-center rounded-full shrink-0
             ${isToday ? "bg-teal-600 text-white" : "text-zinc-700"}
           `}
@@ -486,7 +486,7 @@ const CalendarView = ({ bookings, guestMap, roomMap }: CalendarViewProps) => {
           <div
             key={b.booking_id}
             className={`
-              w-full rounded px-1 py-0.5 mb-0.5 text-[9px] leading-tight
+              w-full rounded px-1 py-0.5 mb-0.5 text-xs leading-tight
               truncate font-lg border
               ${statusBg[b.status]} ${statusTextColor[b.status]}
             `}
@@ -560,7 +560,7 @@ const CalendarView = ({ bookings, guestMap, roomMap }: CalendarViewProps) => {
           day: "p-0 w-full h-full border-gray-100",
           day_button: "w-full h-full",
           weekdays: "grid grid-cols-7 bg-gray-50 border-b",
-          weekday: "text-center text-xs font-medium text-gray-500 py-2"
+          weekday: "text-center text-xs font-medium text-gray-500 py-2",
         }}
         formatters={{
           formatWeekdayName: (date) =>
@@ -581,7 +581,6 @@ const CalendarView = ({ bookings, guestMap, roomMap }: CalendarViewProps) => {
         ))}
       </div>
 
-      {/* ── Day detail dialog ── */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         {selectedDate && (
           <DayDetailContent
@@ -645,70 +644,69 @@ const BookingPage = () => {
   return (
     <div className="space-y-4 p-6">
       <div className="flex items-center justify-between">
-          <div className="flex items-center border rounded-lg p-0.5 bg-gray-50">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setView("calendar")}
-              className={`h-8 px-3 cursor-pointer rounded-md ${
-                view === "calendar"
-                  ? "bg-white shadow-sm font-semibold"
-                  : "text-gray-400"
-              }`}
-            >
-              <CalendarDays className="h-4 w-4 mr-1.5" /> Calendar
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setView("table")}
-              className={`h-8 px-3 cursor-pointer rounded-md ${
-                view === "table"
-                  ? "bg-white shadow-sm font-semibold"
-                  : "text-gray-400"
-              }`}
-            >
-              <TableIcon className="h-4 w-4 mr-1.5" /> Table
-            </Button>
-          </div>
+        <div className="flex items-center border rounded-lg p-0.5 bg-gray-50">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setView("calendar")}
+            className={`h-8 px-3 cursor-pointer rounded-md ${
+              view === "calendar"
+                ? "bg-white shadow-sm font-semibold"
+                : "text-gray-400"
+            }`}
+          >
+            <CalendarDays className="h-4 w-4 mr-1.5" /> Calendar
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setView("table")}
+            className={`h-8 px-3 cursor-pointer rounded-md ${
+              view === "table"
+                ? "bg-white shadow-sm font-semibold"
+                : "text-gray-400"
+            }`}
+          >
+            <TableIcon className="h-4 w-4 mr-1.5" /> Table
+          </Button>
+        </div>
 
-          {/* New booking */}
-          <Dialog open={addOpen} onOpenChange={setAddOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-teal-600 hover:bg-teal-700 text-white cursor-pointer">
-                <Plus className="mr-2 h-4 w-4" /> New Booking
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Booking</DialogTitle>
-              </DialogHeader>
-              <BookingForm
-                initialValues={{
-                  guest_id: 0,
-                  room_id: 0,
-                  check_in_date: new Date(),
-                  check_out_date: new Date(),
-                  status: "booked",
-                }}
-                submitLabel="Create Booking"
-                guests={guests}
-                rooms={rooms}
-                apiCall={(data) =>
-                  api("/api/bookings", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data),
-                  })
-                }
-                onSuccess={() => {
-                  setAddOpen(false);
-                  fetchAll();
-                }}
-              />
-            </DialogContent>
-          </Dialog>
-        
+        {/* New booking */}
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-teal-600 hover:bg-teal-700 text-white cursor-pointer">
+              <Plus className="mr-2 h-4 w-4" /> New Booking
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Booking</DialogTitle>
+            </DialogHeader>
+            <BookingForm
+              initialValues={{
+                guest_id: 0,
+                room_id: 0,
+                check_in_date: new Date(),
+                check_out_date: new Date(),
+                status: "booked",
+              }}
+              submitLabel="Create Booking"
+              guests={guests}
+              rooms={rooms}
+              apiCall={(data) =>
+                api("/api/bookings", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(data),
+                })
+              }
+              onSuccess={() => {
+                setAddOpen(false);
+                fetchAll();
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* ── Calendar view ── */}
@@ -778,16 +776,16 @@ const BookingPage = () => {
                 bookings.map((booking) => (
                   <TableRow key={booking.booking_id}>
                     <TableCell className="font-medium">
-                      #{booking.booking_id}
+                      {booking.booking_id}
                     </TableCell>
                     <TableCell>
                       {guestMap[booking.guest_id] ??
-                        `Guest #${booking.guest_id}`}
+                        `Guest ${booking.guest_id}`}
                     </TableCell>
                     <TableCell>
                       {roomMap[booking.room_id]
                         ? `Room ${roomMap[booking.room_id]}`
-                        : `#${booking.room_id}`}
+                        : `${booking.room_id}`}
                     </TableCell>
                     <TableCell>{toDateInput(booking.check_in_date)}</TableCell>
                     <TableCell>{toDateInput(booking.check_out_date)}</TableCell>
@@ -859,7 +857,7 @@ const BookingPage = () => {
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
-                              Delete Booking #{booking.booking_id}?
+                              Delete Booking {booking.booking_id}?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               This will permanently delete the booking record.

@@ -17,8 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BedDouble, BedSingle, CalendarCheck, Users, ArrowRight } from "lucide-react";
-
-// ── Stat Card ─────────────────────────────────────────────────────────────────
+  
 interface StatCardProps {
   title: string;
   value: string | number;
@@ -47,7 +46,6 @@ const StatCard = ({ title, value, icon, loading }: StatCardProps) => (
   </Card>
 );
 
-// ── Nav Card ──────────────────────────────────────────────────────────────────
 interface NavCardProps {
   title: string;
   subtitle: string;
@@ -70,7 +68,6 @@ const NavCard = ({ title, subtitle, href }: NavCardProps) => (
   </Link>
 );
 
-// ── Booking status helpers ────────────────────────────────────────────────────
 const bookingBadge: Record<
   Booking["status"],
   "default" | "destructive" | "secondary" | "outline"
@@ -90,7 +87,6 @@ const bookingLabel: Record<Booking["status"], string> = {
 
 const toDateInput = (dateStr: string) => dateStr?.slice(0, 10) ?? "";
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
 const DashboardPage = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -179,7 +175,6 @@ const DashboardPage = () => {
         />
       </div>
 
-      {/* Recent Bookings */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base font-semibold">Recent Bookings</CardTitle>

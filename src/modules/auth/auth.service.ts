@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose";
 import * as repo from "./auth.repository";
 import { LoginInput } from "./auth.schema";
 
@@ -14,7 +14,12 @@ export const login = async ({ email, password }: LoginInput) => {
     throw new Error("No Secret key found.");
   }
 
-  const token = jwt.sign({ userId: admin.user_id }, process.env.JWT_SECRET_KEY);
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
+
+  const token = await new SignJWT({ userId: admin.user_id })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("1d")
+    .sign(secret);
 
   return token;
 };
