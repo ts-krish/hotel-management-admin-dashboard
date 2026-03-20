@@ -2,8 +2,6 @@ import { jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
 
 export const proxy = async (request: NextRequest) => {
-  console.log("RUNNING");
-  console.log("PROXY HIT:", request.nextUrl.pathname);
   const token = request.cookies.get("token")?.value;
   const isApi = request.nextUrl.pathname.startsWith("/api");
 

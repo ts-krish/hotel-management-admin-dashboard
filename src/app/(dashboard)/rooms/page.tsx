@@ -45,6 +45,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const statusVariant: Record<
   Room["status"],
@@ -112,7 +113,9 @@ const RoomForm = ({
           // CHANGED: gate error styling on touched.room_number
           // Before: className={errors.room_number ? "border-red-400" : ""}
           // After:  className={touched.room_number && errors.room_number ? "..." : ""}
-          className={touched.room_number && errors.room_number ? "border-red-400" : ""}
+          className={
+            touched.room_number && errors.room_number ? "border-red-400" : ""
+          }
         />
         {/* CHANGED: gate error message on touched */}
         {touched.room_number && errors.room_number && (
@@ -129,7 +132,11 @@ const RoomForm = ({
           onValueChange={(val) => setFieldValue("room_type", val)}
         >
           {/* CHANGED: gate border on touched.room_type */}
-          <SelectTrigger className={touched.room_type && errors.room_type ? "border-red-400" : ""}>
+          <SelectTrigger
+            className={
+              touched.room_type && errors.room_type ? "border-red-400" : ""
+            }
+          >
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
@@ -156,7 +163,11 @@ const RoomForm = ({
           onChange={handleChange}
           onBlur={handleBlur}
           // CHANGED: gate on touched.price_per_night
-          className={touched.price_per_night && errors.price_per_night ? "border-red-400" : ""}
+          className={
+            touched.price_per_night && errors.price_per_night
+              ? "border-red-400"
+              : ""
+          }
         />
         {/* CHANGED: gate error message on touched */}
         {touched.price_per_night && errors.price_per_night && (
@@ -229,7 +240,10 @@ const RoomPage = () => {
     try {
       await api(`/api/rooms/${id}`, { method: "DELETE" });
       setRooms((prev) => prev.filter((r) => r.room_id !== id));
-    } catch {}
+      toast.success("Room deleted");
+    } catch {
+      toast.error("Failed to delete room");
+    }
   };
 
   return (
@@ -265,6 +279,7 @@ const RoomPage = () => {
                 })
               }
               onSuccess={() => {
+                toast.success("Room added successfully");
                 setAddOpen(false);
                 fetchRooms();
               }}
@@ -365,6 +380,7 @@ const RoomPage = () => {
                             })
                           }
                           onSuccess={() => {
+                            toast.success("Room updated successfully");
                             setEditRoom(null);
                             fetchRooms();
                           }}
@@ -386,7 +402,8 @@ const RoomPage = () => {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Delete Room?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to delete room {room.room_number}? This action cannot be undone.
+                            Are you sure you want to delete room{" "}
+                            {room.room_number}? This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

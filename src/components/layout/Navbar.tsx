@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const router = useRouter();
@@ -18,8 +19,11 @@ const Navbar = () => {
   const handleLogOut = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
+      toast.success("Logout successfully.");
       router.push("/login");
-    } catch {}
+    } catch {
+      toast.error("Failed to Logout");
+    }
   };
 
   const getTitle = () => {

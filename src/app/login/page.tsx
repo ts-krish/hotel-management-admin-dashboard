@@ -8,6 +8,7 @@ import useForm from "@/hooks/useForm";
 import { LoginInput, loginSchema } from "@/modules/auth/auth.schema";
 import { Building2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -37,9 +38,11 @@ const LoginPage = () => {
 
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body?.error ?? "Invalid credentials. Please try again.");
+        throw new Error(
+          body?.error ?? "Invalid credentials. Please try again.",
+        );
       }
-
+      toast.success("Logged in successfully");
       router.push("/dashboard");
     },
   });
@@ -66,7 +69,6 @@ const LoginPage = () => {
         <Card className="border-zinc-200 shadow-sm">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
               {/* Form-level error — unchanged */}
               {formError && (
                 <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
@@ -89,7 +91,11 @@ const LoginPage = () => {
                   // so the red border only appears after the user has blurred the field.
                   // Before: className={errors.email ? "border-red-400 ..." : ""}
                   // After:  className={touched.email && errors.email ? "..." : ""}
-                  className={touched.email && errors.email ? "border-red-400 focus-visible:ring-red-300" : ""}
+                  className={
+                    touched.email && errors.email
+                      ? "border-red-400 focus-visible:ring-red-300"
+                      : ""
+                  }
                 />
                 {/* CHANGED: show error only when field is touched */}
                 {touched.email && errors.email && (
@@ -109,7 +115,11 @@ const LoginPage = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   // CHANGED: gate on touched.password
-                  className={touched.password && errors.password ? "border-red-400 focus-visible:ring-red-300" : ""}
+                  className={
+                    touched.password && errors.password
+                      ? "border-red-400 focus-visible:ring-red-300"
+                      : ""
+                  }
                 />
                 {/* CHANGED: show error only when field is touched */}
                 {touched.password && errors.password && (
@@ -132,7 +142,6 @@ const LoginPage = () => {
                   "Sign In"
                 )}
               </Button>
-
             </form>
           </CardContent>
         </Card>

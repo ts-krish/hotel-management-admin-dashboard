@@ -64,8 +64,8 @@ import {
   Trash2,
   User,
 } from "lucide-react";
+import { toast } from "sonner";
 
-// ── Status display maps — unchanged ──────────────────────────────────────────
 const statusVariant: Record<
   Booking["status"],
   "default" | "destructive" | "secondary" | "outline"
@@ -105,8 +105,18 @@ const statusTextColor: Record<Booking["status"], string> = {
 };
 
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const toDateStr = (d: Date) =>
@@ -154,11 +164,11 @@ const BookingForm = ({
 
   // Pre-compute touched+error guards to keep JSX concise.
   // CHANGED: all error display now gated on touched — before it was errors.field alone.
-  const showGuestError    = touched.guest_id      && errors.guest_id;
-  const showRoomError     = touched.room_id        && errors.room_id;
-  const showCheckInError  = touched.check_in_date  && errors.check_in_date;
+  const showGuestError = touched.guest_id && errors.guest_id;
+  const showRoomError = touched.room_id && errors.room_id;
+  const showCheckInError = touched.check_in_date && errors.check_in_date;
   const showCheckOutError = touched.check_out_date && errors.check_out_date;
-  const showStatusError   = touched.status         && errors.status;
+  const showStatusError = touched.status && errors.status;
 
   const availableRooms = rooms.filter((r) => r.status === "available");
 
@@ -208,7 +218,9 @@ const BookingForm = ({
           </SelectTrigger>
           <SelectContent>
             {availableRooms.length === 0 ? (
-              <SelectItem value="none" disabled>No available rooms</SelectItem>
+              <SelectItem value="none" disabled>
+                No available rooms
+              </SelectItem>
             ) : (
               availableRooms.map((r) => (
                 <SelectItem key={r.room_id} value={String(r.room_id)}>
@@ -245,16 +257,10 @@ const BookingForm = ({
                 ? toDateInput(String(values.check_in_date))
                 : ""
             }
-            // CHANGED: type="date" inputs give a "YYYY-MM-DD" string, but our
-            // Yup schema uses Yup.date() which expects a real Date object.
-            // Using handleChange would store the raw string and cause Yup to
-            // fail or coerce unexpectedly, so we call setFieldValue with
-            // new Date(value) instead. setFieldValue also marks the field
-            // as touched, triggering validation immediately on change.
             onChange={(e) =>
               setFieldValue(
                 "check_in_date",
-                e.target.value ? new Date(e.target.value) : null
+                e.target.value ? new Date(e.target.value) : null,
               )
             }
             onBlur={handleBlur}
@@ -263,7 +269,9 @@ const BookingForm = ({
           />
           {/* CHANGED: gate error message on showCheckInError */}
           {showCheckInError && (
-            <p className="text-xs text-red-500">{errors.check_in_date as string}</p>
+            <p className="text-xs text-red-500">
+              {errors.check_in_date as string}
+            </p>
           )}
         </div>
         <div className="flex flex-col gap-1.5">
@@ -281,7 +289,7 @@ const BookingForm = ({
             onChange={(e) =>
               setFieldValue(
                 "check_out_date",
-                e.target.value ? new Date(e.target.value) : null
+                e.target.value ? new Date(e.target.value) : null,
               )
             }
             onBlur={handleBlur}
@@ -290,7 +298,9 @@ const BookingForm = ({
           />
           {/* CHANGED: gate error message on showCheckOutError */}
           {showCheckOutError && (
-            <p className="text-xs text-red-500">{errors.check_out_date as string}</p>
+            <p className="text-xs text-red-500">
+              {errors.check_out_date as string}
+            </p>
           )}
         </div>
       </div>
@@ -338,7 +348,6 @@ const BookingForm = ({
   );
 };
 
-// ── DayDetailContent (read-only, no form) — unchanged ────────────────────────
 interface DayDetailProps {
   date: Date;
   bookings: Booking[];
@@ -661,7 +670,10 @@ const BookingPage = () => {
     try {
       await api(`/api/bookings/${id}`, { method: "DELETE" });
       setBookings((prev) => prev.filter((b) => b.booking_id !== id));
-    } catch {}
+      toast.success("Booking deleted");
+    } catch {
+      toast.error("Failed to delete booking");
+    }
   };
 
   const guestMap = Object.fromEntries(
@@ -730,6 +742,7 @@ const BookingPage = () => {
                 })
               }
               onSuccess={() => {
+                toast.success("Booking added successfully");
                 setAddOpen(false);
                 fetchAll();
               }}
@@ -863,6 +876,7 @@ const BookingPage = () => {
                               })
                             }
                             onSuccess={() => {
+                              toast.success("Booking updated successfully");
                               setEditBooking(null);
                               fetchAll();
                             }}

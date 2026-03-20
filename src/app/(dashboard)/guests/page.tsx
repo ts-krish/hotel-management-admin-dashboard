@@ -30,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Eye, Loader2, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 const bookingBadge: Record<
   Booking["status"],
@@ -50,7 +51,6 @@ const bookingLabel: Record<Booking["status"], string> = {
 
 const toDateInput = (dateStr: string) => dateStr?.slice(0, 10) ?? "";
 
-// ── Guest Form ────────────────────────────────────────────────────────────────
 interface GuestFormProps {
   initialValues: CreateGuestInput;
   onSuccess: () => void;
@@ -67,9 +67,6 @@ const GuestForm = ({
   const {
     values,
     errors,
-    // CHANGED: destructure `touched` — required to gate error visibility.
-    // Formik only marks a field touched after blur or form submit, so without
-    // this check errors would appear before the user has interacted with the field.
     touched,
     formError,
     isSubmitting,
@@ -103,10 +100,9 @@ const GuestForm = ({
           value={values.full_name}
           onChange={handleChange}
           onBlur={handleBlur}
-          // CHANGED: gate red border on touched.full_name
-          // Before: className={errors.full_name ? "border-red-400" : ""}
-          // After:  className={touched.full_name && errors.full_name ? "..." : ""}
-          className={touched.full_name && errors.full_name ? "border-red-400" : ""}
+          className={
+            touched.full_name && errors.full_name ? "border-red-400" : ""
+          }
         />
         {/* CHANGED: gate error message on touched */}
         {touched.full_name && errors.full_name && (
@@ -145,7 +141,9 @@ const GuestForm = ({
           onChange={handleChange}
           onBlur={handleBlur}
           // CHANGED: gate on touched.phone_number
-          className={touched.phone_number && errors.phone_number ? "border-red-400" : ""}
+          className={
+            touched.phone_number && errors.phone_number ? "border-red-400" : ""
+          }
         />
         {/* CHANGED: gate error message on touched */}
         {touched.phone_number && errors.phone_number && (
@@ -319,6 +317,7 @@ const GuestPage = () => {
                 })
               }
               onSuccess={() => {
+                toast.success("Guest added successfully.");
                 setAddOpen(false);
                 fetchGuests();
               }}
